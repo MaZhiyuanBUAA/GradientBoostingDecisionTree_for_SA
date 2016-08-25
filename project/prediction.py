@@ -5,16 +5,16 @@ Created on Jul 10, 2016
 @author: shawn
 '''
 import sys
-from toolkits import feature1
-from toolkits import feature2
-from toolkits import feature3
-from toolkits import feature4
-from toolkits import feature5
-from toolkits import feature6
+from bin import feature1
+from bin import feature2
+from bin import feature3
+from bin import feature4
+from bin import feature5
+from bin import feature6
 import redis
 
 from sklearn.externals import joblib
-from toolkits.tree_classify import loadX
+from bin.tree_classify import loadX
 from tree_classify import classify
 
 pyPath = sys.argv[1]

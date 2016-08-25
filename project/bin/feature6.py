@@ -5,6 +5,8 @@ Created on Fri May 06 20:57:36 2016
 @author: Richard
 """
 import re
+import numpy as np
+
 def get_word(file_name):
 	s = []
 	f = open(file_name)
@@ -19,9 +21,9 @@ def get_word(file_name):
 class feature6(object):
 	def __init__(self,path):
 		#self.pyPath = path
-		self.solve_word = get_word(path + "/dict/solve_word.txt")  
-		self.cannot_word = get_word(path + "/dict/cannot_word.txt")
-		self.can_word = get_word(path + "/dict/can_word.txt")
+		self.solve_word = get_word(path + "/project/dict/solve_word.txt")  
+		self.cannot_word = get_word(path + "/project/dict/cannot_word.txt")
+		self.can_word = get_word(path + "/project/dict/can_word.txt")
 	#用户重复句子数
 	def get_x0(self,visitor):
 		return 1.*(len(visitor)-len(list(set(visitor))))
@@ -74,9 +76,7 @@ class feature6(object):
 	def get_x(self,visitor,agent):
 		#visitor<list>:用户语句
 		#agent<list>:客服语句
-		x = []
-		for i in xrange(10):
-			x.append(0.0)
+		x = np.zeros(10)
 		x[0] = self.get_x0(visitor)
 		x[1] = self.get_x1(visitor)
 		x[2] = self.get_x2(visitor)
@@ -87,27 +87,20 @@ class feature6(object):
 		x[7] = x[2]/len(visitor)
 		x[8] = x[3]/len(visitor)    
 		x[9] = x[4]/len(visitor)  
-		s = ''  
-		for i in xrange(10):
-			s+= str(x[i]) + ' '
-		return s
+		return x
 
-	def extractF6(self,srcFile):
-		lines = srcFile.split('\r\n')
-		visitor = list()
-		agent = list()
+	def extractF6(self, dialogs):
 		f6 = list()
-		for line in lines:
-			if not line and not line.strip():
-				continue
-			l = line.split('|')[1].split(':')[1]
-			l = l.strip()
-			if line.find('Visitor') > -1:
-				visitor.append(l)
-			if line.find('Agent') > -1:
-				agent.append(l)
-
-		s = self.get_x(visitor, agent)
-		f6.append(s)
+		for dialog in dialogs:
+			visitor = list()
+			agent = list()
+			for line in dialog:
+				if line.find('Visitor') > -1:
+					visitor.append(line)
+				if line.find('Agent') > -1:
+					agent.append(line)
+			s = self.get_x(visitor, agent)
+			f6.append(s)
+		#print f6
 		return f6
 

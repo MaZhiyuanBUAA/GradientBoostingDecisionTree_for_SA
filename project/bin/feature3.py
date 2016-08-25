@@ -6,6 +6,7 @@ Created on Fri May 06 14:07:11 2016
 """
 import datetime
 import math
+import numpy as np
 
 def get_x0(t,f):
 	start = t[0]
@@ -84,16 +85,11 @@ def get_x9(ds):
 		return 0.0
 
 def time_feature(dialog):
-	s = ''
-	x = []
 	dialog_t = []
 	dialog_f = []
 	visitor_t = []
 	agent_t = []
-	for i in xrange(10):
-		x.append(0.0)
-	t = ''
-	ds = ''
+	x = np.zeros(10)
 	for sentence in dialog:
 		t = sentence.split('|')[0].strip()
 		t = t.replace('：',':')
@@ -107,7 +103,6 @@ def time_feature(dialog):
 		else:
 			dialog_f.append('a')
 			agent_t.append(datetime.datetime.strptime(t,'%Y-%m-%d %H:%M:%S'))
-		ds += sentence.replace('\n','')
 
 	x[0] = get_x0(dialog_t,dialog_f)
 	x[1] = get_x1(dialog_t,dialog_f)
@@ -124,34 +119,15 @@ def time_feature(dialog):
 	#agent对话总时间
 	x[8] = get_x8(agent_t)
 
-	x[9] = get_x9(ds)
+	x[9] = get_x9(''.join(dialog))
 
-	for i in x:
-		s += str(i)+' '
-	return s
+	return x
 
 class feature3(object):
 
-	def extractF3(self, srcSessions):
-		lines = srcSessions.split('\r\n')
-		count = 0
-		dialog = []
-		f3=[]
-		s = ''
-		for line in lines:
-			if not line or not line.strip():
-				continue        
-			if line[0] == '#':
-				count += 1 
-				if count == 1:
-					continue
-				s += time_feature(dialog)
-				f3.append(s)
-				s = ''
-				dialog = []
-			else:
-				dialog.append(line)
-		s += time_feature(dialog)
-		f3.append(s)
+	def extractF3(self, dialogs):
+		f3 = list()
+		for dialog in dialogs:
+			f3.append(time_feature(dialog))
 		return f3
 
